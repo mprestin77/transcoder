@@ -1,5 +1,5 @@
 #/bin/bash
-DB_HOST="<DB Systsem IP address>"
+DB_HOST="<MySQL DB system IP address>"
 DB_NAME="tc"
 DB_ADMIN_USER="mysqladmin"
 DB_USER="tc"
