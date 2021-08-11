@@ -4,15 +4,25 @@
 
 2. In Identity & Security/Dynamic Groups create a dynamic group that matches the compartment where OKE cluster was created. 
    All containers connect to OCI services using instance principal authentication.  Assign the following policies to the dynamic group:
+   
    allow dynamic-group dynamic-group-name to manage streams in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage repos in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage object-family in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage secret-family in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage cluster-family in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage instance-family in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage virtual-network-family in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage cluster-node-pools in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to manage vnics in compartment id 'compartment OCID'
+   
    allow dynamic-group dynamic-group-name to inspect compartments in compartment id 'compartment OCID'
 
 3. Configure OKE cluster autoscaler following OCI documentation
