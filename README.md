@@ -104,10 +104,10 @@
 19. Go to Observability & Management/Event Service in OCI console and create an event rule:
     Rule Conditions:
     Condition="Event Type" :  Service-Name="Object Storage" Event-Type: "Object - Create"
-    Condition="Attribute" : Attribute-Name=<Name of the source OS bucket>
+    Condition="Attribute" : Attribute-Name="<name of the source OS bucket>"
 
     Actions:
-    Action Type="Streaming" Streaming-Compartment=<your compartment name>
+    Action Type="Streaming" Streaming-Compartment="<your compartment name>"
 
 20. Upload a new video file to the source OS bucket and check in Event Metrics that a new event is emitted. 
     If you see a new event emitted, go to OSS stream and check in OSS Metrics that a new request is added to the queue
