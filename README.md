@@ -107,7 +107,7 @@
     Condition="Attribute" : Attribute-Name=<Name of the source OS bucket>
 
     Actions:
-    Action Type="Streaming" Streamingr-Compartment=<your compartment name>
+    Action Type="Streaming" Streaming-Compartment=<your compartment name>
 
 20. Upload a new video file to the source OS bucket and check in Event Metrics that a new event is emitted. 
     If you see a new event emitted, go to OSS stream and check in OSS Metrics that a new request is added to the queue
