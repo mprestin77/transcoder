@@ -26,6 +26,7 @@
    allow dynamic-group dynamic-group-name to inspect compartments in compartment id 'compartment OCID'
 
 3. Configure OKE cluster autoscaler following OCI documentation
+
    https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm
 
 4. Go to Analytics & AI/Streaming and create OSS stream "transcode". You can use the default settings with 1 partition.
