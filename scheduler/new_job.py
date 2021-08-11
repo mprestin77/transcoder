@@ -8,11 +8,10 @@ def create_job_object(os_file):
     # Configureate Pod template container
     print("Starting a new transcoding job", flush=True)
     repo=os.environ['TC_OCIR_REPO']
-#    src_bucket = os.environ['TC_SRC_BUCKET']
-#    dst_bucket = os.environ['TC_DST_BUCKET']
     oke_nodepool = os.environ['TC_OKE_NODEPOOL']
+    cpu_per_job = os.environ['TC_CPU_REQUEST_PER_JOB']
     requested_resources=client.V1ResourceRequirements(
-        requests={"cpu": "0.5"}
+        requests={"cpu": cpu_per_job}
     )
     container = client.V1Container(
         name="transcoder",
