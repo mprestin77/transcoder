@@ -63,7 +63,7 @@ spec:
       serviceAccountName: job-scheduler
       containers:
       - name: "scheduler"
-        image: iad.ocir.io/ocisateam/mikep/scheduler:latest
+        image: <OCIR repo path>/scheduler:latest
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
