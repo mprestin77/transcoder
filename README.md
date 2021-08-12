@@ -3,6 +3,7 @@
 1. In OCI console go to Development Services/Kubernetes Clusters (OKE) and create an OKE cluster with a nodepool on a private or public subnet
 
 2. In Identity & Security/Dynamic Groups create a dynamic group that matches the compartment where OKE cluster was created. 
+
    All containers connect to OCI services using instance principal authentication.  Assign the following policies to the dynamic group:
    
    allow dynamic-group dynamic-group-name to manage streams in compartment id 'compartment OCID'
@@ -32,9 +33,11 @@
 4. Go to Analytics & AI/Streaming and create OSS stream "transcode". You can use the default settings with 1 partition.
 
 5. Go to Databases/MySQL DB Systems and create a standalone MySQL DB system attached to the same subnet as the created OKE nodepool.
+
    Insure that in the subnet security list port tcp/3306 is open for traffic from your VCN.
 
-6. Go to Networking/Virtual Cloud Network, select you VCN and add a service gateway to All 'region' Services In Oracle Services Network 
+6. Go to Networking/Virtual Cloud Network, select you VCN and add a service gateway to All 'region' Services In Oracle Services Network.
+
    Edit your subnet route table and add a route rule to All 'region' Services In Oracle Services Network" through the service gateway.
    
 7. Create a staging/bastion VM attached to a public subnet on the same VCN. Install git, mysql-client, docker and kubectl on this VM
@@ -44,6 +47,12 @@
    sudo yum install mysql
 
    sudo yum install docker
+
+   sudo systemctl enable docker
+
+   sudo systemctl start docker
+
+   sudo usermod -a -G docker opc
 
    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
@@ -87,21 +96,37 @@
 
     DB_ADMIN_USER="MySQL admin user"   
 
+    The script first prompts you to enter MySQL Admin user password (that you used when creating MySQL DB system) and then to enter MySQL "tc" user password.
+
     create_db.sh script connects using mysql client to MySQL DB system that you created on OCI through TCP port 3306. 
 
     If the script cannot connect to MySQL DB check that the port tcp/3306 is open in the security list of the subnet where MySQL DB system is attached.
   
-14. Go to transcoder/scheduler directory.  Edit build.sh script and set OCIR_REPO variable to your OCIR repo path.
+14. Create a k8s secret to with MySQL "tc" user password. Enrypt MySQL "tc" user password
+
+    echo -n 'enter mysql DB password' | base64
+
+    This command returns base64 encrypted value of the password.  Go to transcoder/oke directory and edit db-secret.yaml file setting "password" to the encrypted string.
+
+    After the file is updated create db-password secret
+
+    kubectl -n transcode apply -f db-secret.yaml  
+
+    and check that the db-secret is created
+
+    kubectl -n transcode get secrets
+
+15. Go to transcoder/scheduler directory.  Edit build.sh script and set OCIR_REPO variable to your OCIR repo path.
 
     Run buiuld.sh script. It builds "scheduler:latest" container image and uploads it to your OCIR repo.
 
-15. Go to transcoder/transcode directory. Edit build.sh script and set OCIR_REPO variable to your OCIR repo path.
+16. Go to transcoder/transcode directory. Edit build.sh script and set OCIR_REPO variable to your OCIR repo path.
 
     Run buiuld.sh script. It builds "transcoder:latest" container image and uploads it to your OCIR repo. 
 
-16. Go to transcoder/oke directory. Edit scheduler.yaml file and search for 'OCIR repo path'. Replace it with your OCIR repo path.
+17. Go to transcoder/oke directory. Edit scheduler.yaml file and search for 'OCIR repo path'. Replace it with your OCIR repo path.
 
-17. Edit configmap.yaml file and set the values of variables
+18. Edit configmap.yaml file and set the values of variables
 
     TC_STREAM_ENDPOINT: "Streaming queue endpoint URL"
 
@@ -127,7 +152,7 @@
 
     kubectl -n transcode -f configmap.yaml
 
-18. Deploy scheduler.yaml 
+19. Deploy scheduler.yaml 
 
     kubectl -n transcode scheduler.yaml
 
@@ -145,7 +170,7 @@
 
     kubectl -n logs "pod NAME" 
 
-19. Go to Observability & Management/Event Service in OCI console and create an event rule:
+20. Go to Observability & Management/Event Service in OCI console and create an event rule:
 
     Rule Conditions:
 
@@ -157,7 +182,7 @@
 
     Action Type="Streaming" Streaming-Compartment="your compartment name"
 
-20. Upload a new video file to the source OS bucket and check in Event Metrics that a new event is emitted. 
+21. Upload a new video file to the source OS bucket and check in Event Metrics that a new event is emitted. 
 
     If you see a new event emitted, go to OSS stream and check in OSS Metrics that a new request is added to the queue
 
