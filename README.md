@@ -1,6 +1,13 @@
 # transcoder
+
+
 ![image](https://user-images.githubusercontent.com/54962742/129648917-6e62834a-45d0-4a5d-a1ee-e6673fe080ca.png)
 
+Data Flow:
+
+A new file is uploaded to the source object storage  bucket. It emits an event that creates a transcoding request in OSS streaming queue. Job scheduler container running on OKE is monitoring the queue and when a new request arrives it starts a new transcoding job running as a container on OKE. The transcoding job uses ffmpeg open source software to transcode to multiple resolutions and different bitrates. It combines the video and audio for every HLS stream, packages each combination, and create individual TS segments and the playlists. On completion it creates a master manifest file, uploads all the files to the destination bucket and updates transcoded_files table in MySQL  "tc" database with the playlist.
+
+Installation instructions:
 
 1. In OCI console go to Development Services/Kubernetes Clusters (OKE) and create an OKE cluster with a nodepool on a private or public subnet
 
