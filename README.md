@@ -80,7 +80,7 @@ Installation instructions:
    docker login 'region'.ocir.io
 
    Replace region with iad for "us-ashburn-1" or phx for "us-phonix-1", etc... 
-   This commands prompts you with user & password. For IDCS users as a username use 'tenancy-name'/oracleidentitycloudservice/'user-name'
+   This commands prompts you with user & password. For IDCS users as a username use 'tenancy-name'/oracleidentitycloudservice/'user-name'.
    The password is the authentication token that you created.
 
 10. Create "transcode" k8s namespace
