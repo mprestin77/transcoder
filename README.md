@@ -1,4 +1,6 @@
 # transcoder
+![image](https://user-images.githubusercontent.com/54962742/129648917-6e62834a-45d0-4a5d-a1ee-e6673fe080ca.png)
+
 
 1. In OCI console go to Development Services/Kubernetes Clusters (OKE) and create an OKE cluster with a nodepool on a private or public subnet
 
