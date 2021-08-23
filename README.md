@@ -66,6 +66,8 @@ Installation instructions:
    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+  
+   Logout and login back to your linux account. After that you should be able to run docker command without sudo. 
 
 8. Download OKE cluster kube config file to the staging VM (replace 'cluster-OCID' and 'region-name' with your cluster OCID and region name)
 
@@ -163,7 +165,7 @@ Installation instructions:
 
 19. Deploy scheduler.yaml 
 
-    kubectl -n transcode scheduler.yaml
+    kubectl -n transcode apply -f scheduler.yaml
 
     It creates k8s service account, role and rolebinding and deploys job-scheduler container.
 
