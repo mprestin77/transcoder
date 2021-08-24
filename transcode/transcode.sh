@@ -10,6 +10,7 @@ DB_HOST=$TC_DB_HOST
 DB_NAME=$TC_DB_NAME
 DB_USER=$TC_DB_USER
 DB_PWD=$TC_DB_PASSWORD
+CDN_URL=$TC_CDN_URL
 
 #Download the input file from OCI object storage
 echo "Downloading file $INPUT_FILE from $INPUT_BUCKET OS bucket"
@@ -27,7 +28,8 @@ cd $OUTPUT_DIR
 echo "Transcoding file $INPUT_FILE"
 ffmpeg -i $ifile $TC_FFMPEG_CONFIG -var_stream_map "${TC_FFMPEG_STREAM_MAP}" stream_%v.m3u8
 
-#Upload the transcoded files to OCI object storage
+  
+#Upload the transcoded files to OCI object storage bucket
 echo "Uploading transcoded files to $TC_DST_BUCKET OS bicket"
 #Firt check if the folder with this name already exists. If found - delete it including all objects inside the folder.
 oci os object bulk-delete --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --prefix $INPUT_FILE/ --force --auth instance_principal
@@ -41,11 +43,34 @@ do
   fi
 done
 
+#Upload manifest files to OCI object storage bucket
 for file in *.m3u8
 do
+  fname=$(echo $file | cut -d'.' -f1)
+  if [[ "$fname" == "stream_"* ]]; then
+    stream_dir="$fname/" #stream manifest file
+  else
+    stream_dir=""        #master manifest file
+  fi
+
+  #If CDN_URL variable is set update manifest files adding CDN_URL prefix to the file path 
+  if [ ! -z $CDN_URL ]; then
+    URL=$(echo $CDN_URL/$INPUT_FILE/$stream_dir | sed -e 's/\//\\\//g')
+    echo $URL
+    sed -i -e "/^[a-z]/ s/^/$URL/" $file
+  fi
+
   oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $file --name $INPUT_FILE/$file --force --auth instance_principal
 done
 
 #Update DB
 echo "Updating $DB_NAME DB"
-mysql -h $DB_HOST -u $DB_USER -p"$DB_PWD" -D $DB_NAME -e "delete from transcoded_files where name='$INPUT_FILE'; insert into transcoded_files (name, bucket, object, create_date) values ('$INPUT_FILE', '$OUTPUT_BUCKET', '$INPUT_FILE/master.m3u8', now())"
+
+if [ ! -z $CDN_URL ]; then
+  URL="$CDN_URL/$INPUT_FILE/master.m3u8"
+else
+  URL=""
+fi
+
+mysql -h $DB_HOST -u $DB_USER -p"$DB_PWD" -D $DB_NAME -e "delete from transcoded_files where name='$INPUT_FILE'; insert into transcoded_files (name, bucket, object, url, create_date) values ('$INPUT_FILE', '$OUTPUT_BUCKET', '$INPUT_FILE/master.m3u8', '$URL', now())"
+
