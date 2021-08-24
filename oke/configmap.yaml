@@ -11,6 +11,7 @@ data:
   TC_OS_NAMESPACE: "<OS namespace (could be different from the tenancy name)>"
   TC_OKE_NODEPOOL: "<OKE nodepool k8s label (could be different from the nodepool name)>"
   TC_OCIR_REPO: "<OCIR repo name, for example for IAD it is iad.ocir.io/ocisateam/<name>"
+  TC_CDN_URL: "<CDN URL, for example, https://tcdemo.b-cdn.net> - leave empty if not integrated with CDN"
   TC_CPU_REQUEST_PER_JOB: "1.5"
   TC_DB_HOST: "<mysql DB system private IP address>"
   TC_DB_NAME: "tc"
