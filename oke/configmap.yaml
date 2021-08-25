@@ -4,21 +4,20 @@ metadata:
   name: transcoder-config
   namespace: transcode
 data:
-  TC_STREAM_ENDPOINT: "<Streaming queue endpoint URL>"  
-  TC_STREAM_OCID: "<OCID of the streaming queue>"  
-  TC_SRC_BUCKET: "<Name of the source OS bucket>"
-  TC_DST_BUCKET: "<Name of the output OS bucket>"
-  TC_OS_NAMESPACE: "<OS namespace (could be different from the tenancy name)>"
-  TC_OKE_NODEPOOL: "<OKE nodepool k8s label (could be different from the nodepool name)>"
-  TC_OCIR_REPO: "<OCIR repo name, for example for IAD it is iad.ocir.io/ocisateam/<name>"
-  TC_CDN_URL: "<CDN URL, for example, https://tcdemo.b-cdn.net> - leave empty if not integrated with CDN"
-  TC_CPU_REQUEST_PER_JOB: "1.5"
-  TC_DB_HOST: "<mysql DB system private IP address>"
+  TC_STREAM_ENDPOINT: "https://cell-1.streaming.us-ashburn-1.oci.oraclecloud.com"  
+  TC_STREAM_OCID: "ocid1.stream.oc1.iad.amaaaaaaxkh5s6iaqqi5suqz5755wgrvnfl2ntirxa66wjg3tkah4dgq23la"  
+  TC_SRC_BUCKET: "input_images"
+  TC_DST_BUCKET: "output_images"
+  TC_OS_NAMESPACE: "ocisateam"
+  TC_OKE_NODEPOOL: "nodepool2"
+  TC_OCIR_REPO: "iad.ocir.io/ocisateam/mikep"
+  TC_DB_HOST: "10.0.0.197"
   TC_DB_NAME: "tc"
   TC_DB_USER: "tc"
-  TC_FFMPEG_CONFIG: "-map v:0 -s:0 1920x1080 -maxrate 5M -minrate 5M -bufsize 10M 
-                     -map v:0 -s:1 1280x720 -maxrate 3M -minrate 3M -bufsize 3M 
-                     -map v:0 -s:2 640x360 -maxrate 1M -minrate 1M -bufsize 1M 
+  TC_CPU_REQUEST_PER_JOB: "1.5"
+  TC_FFMPEG_CONFIG: "-map v:0 -s:0 1920x1080 -b:v 5M -maxrate 5M -minrate 5M -bufsize 10M 
+                     -map v:0 -s:1 1280x720 -b:v 3M -maxrate 3M -minrate 3M -bufsize 3M 
+                     -map v:0 -s:2 640x360 -b:v:0 1M -maxrate 1M -minrate 1M -bufsize 1M 
                      -map a:0 -map a:0 -map a:0 -c:a aac -b:a 128k -ac 1 -ar 44100 
                      -g 48 -sc_threshold 0 -c:v libx264 
                      -f hls 
@@ -27,3 +26,4 @@ data:
                      -hls_segment_filename stream_%v/data%02d.ts 
                      -master_pl_name master.m3u8"
   TC_FFMPEG_STREAM_MAP: "v:0,a:0 v:1,a:1 v:2,a:2" 
+  TC_FFMPEG_HLS_BASE_URL: "https://tcdemo.b-cdn.net"
