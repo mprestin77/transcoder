@@ -10,7 +10,6 @@ DB_HOST=$TC_DB_HOST
 DB_NAME=$TC_DB_NAME
 DB_USER=$TC_DB_USER
 DB_PWD=$TC_DB_PASSWORD
-CDN_URL=$TC_FFMPEG_HLS_BASE_URL
 
 #Download the input file from OCI object storage
 echo "Downloading file $INPUT_FILE from $INPUT_BUCKET OS bucket"
@@ -46,28 +45,14 @@ done
 #Upload manifest files to OCI object storage bucket
 for file in *.m3u8
 do
-#  fname=$(echo $file | cut -d'.' -f1)
-#  if [[ "$fname" == "stream_"* ]]; then
-#    stream_dir="$fname/" #stream manifest file
-#  else
-#    stream_dir=""        #master manifest file
-#  fi
-
-  #If CDN_URL variable is set update manifest files adding CDN_URL prefix to the file path 
-#  if [ ! -z $CDN_URL ]; then
-#    URL=$(echo $CDN_URL/$INPUT_FILE/$stream_dir | sed -e 's/\//\\\//g')
-#    echo $URL
-#    sed -i -e "/^[a-z]/ s/^/$URL/" $file
-#  fi
-
   oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $file --name $INPUT_FILE/$file --force --auth instance_principal
 done
 
 #Update DB
 echo "Updating $DB_NAME DB"
 
-if [ ! -z $CDN_URL ]; then
-  URL="$CDN_URL/$INPUT_FILE/master.m3u8"
+if [ ! -z $TC_FFMPEG_HLS_BASE_URL ]; then
+  URL="$TC_FFMPEG_HLS_BASE_URL/$INPUT_FILE/master.m3u8"
 else
   URL=""
 fi
