@@ -23,7 +23,7 @@ data:
                      -f hls 
                      -hls_time 5 
                      -hls_playlist_type vod 
-                     -hls_segment_filename stream_%v/data%02d.ts 
+                     -hls_segment_filename stream_%v_%03d.ts
                      -master_pl_name master.m3u8"
   TC_FFMPEG_STREAM_MAP: "v:0,a:0 v:1,a:1 v:2,a:2" 
   TC_FFMPEG_HLS_BASE_URL: "https://tcdemo.b-cdn.net"

@@ -25,27 +25,17 @@ cd $OUTPUT_DIR
 
 #Run ffmpeg transcoding
 echo "Transcoding file $INPUT_FILE"
-ffmpeg -i $ifile $TC_FFMPEG_CONFIG -hls_base_url "${TC_FFMPEG_HLS_BASE_URL}/${INPUT_FILE}/" -var_stream_map "${TC_FFMPEG_STREAM_MAP}" stream_%v.m3u8
+#ffmpeg -i $ifile $TC_FFMPEG_CONFIG -hls_base_url "${TC_FFMPEG_HLS_BASE_URL}/${INPUT_FILE}/" -var_stream_map "${TC_FFMPEG_STREAM_MAP}" stream_%v.m3u8
+ffmpeg -i $ifile $TC_FFMPEG_CONFIG -var_stream_map "${TC_FFMPEG_STREAM_MAP}" stream_%v.m3u8
 
   
 #Upload the transcoded files to OCI object storage bucket
 echo "Uploading transcoded files to $TC_DST_BUCKET OS bicket"
 #Firt check if the folder with this name already exists. If found - delete it including all objects inside the folder.
 oci os object bulk-delete --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --prefix $INPUT_FILE/ --force --auth instance_principal
-for dir in *
+for file in *.{m3u8,ts}
 do
-  if [ -d $dir ]; then
-    for file in $dir/*
-    do
-      oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $file --name $INPUT_FILE/$file --force --auth instance_principal
-    done
-  fi
-done
-
-#Upload manifest files to OCI object storage bucket
-for file in *.m3u8
-do
-  oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $file --name $INPUT_FILE/$file --force --auth instance_principal
+   oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $file --name $INPUT_FILE/$file --force --auth instance_principal
 done
 
 #Update DB
